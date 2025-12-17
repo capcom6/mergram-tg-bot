@@ -38,7 +38,7 @@ func Module(withRouter bool) fx.Option {
 					case <-waitCh:
 					case <-ctx.Done():
 						logger.Warn("bot stop timed out")
-						return ctx.Err()
+						return nil
 					}
 					logger.Info("bot stopped")
 					return nil
