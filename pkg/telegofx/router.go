@@ -12,7 +12,7 @@ type Router struct {
 }
 
 func NewRouter(_ Config, bot *Bot) (*Router, error) {
-	hanlder, err := th.NewBotHandler(
+	handler, err := th.NewBotHandler(
 		bot.Bot,
 		bot.Updates(),
 	)
@@ -21,7 +21,7 @@ func NewRouter(_ Config, bot *Bot) (*Router, error) {
 	}
 
 	return &Router{
-		BotHandler: hanlder,
+		BotHandler: handler,
 	}, nil
 }
 
