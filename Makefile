@@ -33,7 +33,7 @@ air: ## Run development server
       exit 1; \
     }
 	@echo "Starting development server with air..."
-	@air
+	TZ=UTC DEBUG=1 air
 
 deps: ## Install dependencies
 	go mod download

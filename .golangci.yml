@@ -262,6 +262,7 @@ linters:
         - ^github.com/gofiber/.+Config$
         - ^github.com/golang-jwt/jwt/v5.+Claims$
         - ^github.com/mitchellh/mapstructure.DecoderConfig$
+        - ^github.com/mymmrac/telego.+Parameters$
         - ^github.com/prometheus/client_golang/.+Opts$
         - ^github.com/secsy/goftp.Config$
         - ^github.com/Shopify/sarama.Config$
