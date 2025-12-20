@@ -3,10 +3,12 @@ module github.com/capcom6/mergram-tg-bot
 go 1.25.5
 
 require (
+	github.com/alitto/pond/v2 v2.6.0
 	github.com/go-core-fx/config v0.1.0
 	github.com/go-core-fx/fiberfx v0.0.1
 	github.com/go-core-fx/logger v0.0.1
 	github.com/mymmrac/telego v1.3.3
+	github.com/samber/lo v1.52.0
 	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.27.1
 )
@@ -48,4 +50,5 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
 	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
 )
