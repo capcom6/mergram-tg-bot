@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/go-core-fx/config"
@@ -22,10 +23,21 @@ type rendererConfig struct {
 	Timeout time.Duration `koanf:"timeout"`
 }
 
+type queueConfig struct {
+	MaxConcurrency int `koanf:"max_concurrency"`
+}
+
+type ratelimiterConfig struct {
+	MaxRequests int           `koanf:"max_requests"`
+	Window      time.Duration `koanf:"window"`
+}
+
 type Config struct {
-	HTTP     httpConfig     `koanf:"http"`
-	Telegram telegramConfig `koanf:"telegram"`
-	Renderer rendererConfig `koanf:"renderer"`
+	HTTP        httpConfig        `koanf:"http"`
+	Telegram    telegramConfig    `koanf:"telegram"`
+	Renderer    rendererConfig    `koanf:"renderer"`
+	Queue       queueConfig       `koanf:"queue"`
+	RateLimiter ratelimiterConfig `koanf:"ratelimiter"`
 }
 
 func New(logger *zap.Logger) (Config, error) {
@@ -41,6 +53,13 @@ func New(logger *zap.Logger) (Config, error) {
 		},
 		Renderer: rendererConfig{
 			Timeout: 3 * time.Second,
+		},
+		Queue: queueConfig{
+			MaxConcurrency: runtime.NumCPU() * 16,
+		},
+		RateLimiter: ratelimiterConfig{
+			MaxRequests: 5,
+			Window:      1 * time.Minute,
 		},
 	}
 

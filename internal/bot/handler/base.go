@@ -1,32 +1,31 @@
 package handler
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/capcom6/mergram-tg-bot/pkg/telegofx"
 	"github.com/mymmrac/telego"
 
-	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
 	"go.uber.org/zap"
 )
 
 type Base struct {
+	Bot    *telegofx.Bot
 	Logger *zap.Logger
 }
 
-func (b *Base) HandleError(ctx *th.Context, message telego.Message, err error) error {
+func (b *Base) HandleError(ctx context.Context, chatID telego.ChatID, err error) {
 	b.Logger.Error("handle update failed", zap.Error(err))
 
-	_, sendErr := ctx.Bot().SendMessage(
+	_, sendErr := b.Bot.SendMessage(
 		ctx,
 		tu.Message(
-			message.Chat.ChatID(),
+			chatID,
 			"Operation failed. Please try again later or contact support.",
 		),
 	)
 	if sendErr != nil {
-		return fmt.Errorf("send message: %w", sendErr)
+		b.Logger.Error("send message failed", zap.Error(sendErr))
 	}
-
-	return nil
 }
