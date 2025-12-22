@@ -62,11 +62,11 @@ func (r *Service) Register(userID int64) error {
 	// Clean up old requests outside the window
 	validRequests := r.getValidRequests(now, userID)
 
-	// Update the requests for this user
-	r.requests[userID] = validRequests
-
 	// Check if user has exceeded the limit
 	if len(validRequests) >= r.maxRequests {
+		// Update the requests for this user
+		r.requests[userID] = validRequests
+
 		return newLimitExceededError(
 			r.maxRequests,
 			r.window,
@@ -123,6 +123,8 @@ func (r *Service) Cleanup() {
 		valid := r.getValidRequests(now, userID)
 		if len(valid) == 0 {
 			delete(r.requests, userID)
+		} else {
+			r.requests[userID] = valid
 		}
 	}
 }
