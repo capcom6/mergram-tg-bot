@@ -50,6 +50,7 @@
   - [Docker Installation (Alternative)](#docker-installation-alternative)
 - [Usage](#usage)
   - [Auto-Detection (Group Messages)](#auto-detection-group-messages)
+  - [Manual Commands](#manual-commands)
   - [Bot Commands](#bot-commands)
   - [Supported Diagram Types](#supported-diagram-types)
 - [Contributing](#contributing)
@@ -156,19 +157,20 @@ Once the bot is running and added to your Telegram group, here's how to use MerG
 
 Simply paste Mermaid code blocks in your group chat:
 
-```
-User: Here's our system architecture:
-```mermaid
-graph TD
-    A[Client] --> B[Load Balancer]
-    B --> C[Server 1]
-    B --> D[Server 2]
-    C --> E[Database]
-    D --> E
-```
+````text
+  User: Here's our system architecture:
 
-Bot: (Automatically replies with rendered diagram image)
-```
+  ```mermaid
+  graph TD
+      A[Client] --> B[Load Balancer]
+      B --> C[Server 1]
+      B --> D[Server 2]
+      C --> E[Database]
+      D --> E
+  ```
+
+  Bot: (Automatically replies with rendered diagram image)
+````
 
 ### Manual Commands
 
