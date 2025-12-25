@@ -117,7 +117,7 @@ This guide will help you get MerGram up and running on your local machine for de
 
 2. **Install dependencies**
    ```sh
-   go mod download
+   make deps
    ```
 
 3. **Environment Setup**
@@ -127,14 +127,9 @@ This guide will help you get MerGram up and running on your local machine for de
    RENDERER__TIMEOUT=10s
    ```
 
-4. **Build the application**
+4. **Run the bot**
    ```sh
-   make build
-   ```
-
-5. **Run the bot**
-   ```sh
-   make run
+   make air
    ```
 
 ### Docker Installation (Alternative)
@@ -234,7 +229,7 @@ Distributed under the Apache License 2.0. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-**Project Maintainer**: Capcom6
+**Project Maintainer**: Aleksandr Soloshenko
 
 - Website: [mergram.dev](https://mergram.dev)
 - Try the bot: [@MerGramBot](https://t.me/MerGramBot)
