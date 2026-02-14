@@ -89,10 +89,22 @@ func (h *Handler) Register(router *telegofx.Router) {
 func (h *Handler) handlePrivateMessage(ctx *th.Context, message telego.Message) error {
 	diagram := strings.TrimSpace(strings.TrimPrefix(message.Text, "/mermaid"))
 	if diagram == "" {
+		h.Logger.Info("empty mermaid command received",
+			zap.Int64("user_id", message.From.ID),
+			zap.Int64("chat_id", message.Chat.ChatID().ID),
+			zap.Int("message_id", message.MessageID),
+		)
 		_, _ = ctx.Bot().
 			SendMessage(ctx, tu.Message(message.Chat.ChatID(), "Please provide a Mermaid diagram after /mermaid"))
 		return nil
 	}
+
+	h.Logger.Info("processing mermaid command",
+		zap.Int64("user_id", message.From.ID),
+		zap.Int64("chat_id", message.Chat.ChatID().ID),
+		zap.Int("message_id", message.MessageID),
+		zap.Int("diagram_length", len(diagram)),
+	)
 
 	h.render(ctx, message.Chat.ChatID(), message.MessageID, diagram)
 
@@ -103,9 +115,20 @@ func (h *Handler) handleGroupMessage(ctx *th.Context, message telego.Message) er
 	// Extract mermaid code
 	diagramCode, ok := ctx.Value(diagramCodeKey).(string)
 	if !ok {
-		h.Logger.Warn("diagram code not found in context", zap.Any("message", message))
+		h.Logger.Warn("diagram code not found in context",
+			zap.Int64("user_id", message.From.ID),
+			zap.Int64("chat_id", message.Chat.ChatID().ID),
+			zap.Int("message_id", message.MessageID),
+		)
 		return nil
 	}
+
+	h.Logger.Info("processing group mermaid diagram",
+		zap.Int64("user_id", message.From.ID),
+		zap.Int64("chat_id", message.Chat.ChatID().ID),
+		zap.Int("message_id", message.MessageID),
+		zap.Int("diagram_length", len(diagramCode)),
+	)
 
 	h.render(ctx, message.Chat.ChatID(), message.MessageID, diagramCode)
 
@@ -150,9 +173,19 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 		diagramCode,
 		func(ctx context.Context, b []byte, err error) {
 			if err != nil {
+				h.Logger.Error("diagram rendering failed",
+					zap.Int64("chat_id", chatID.ID),
+					zap.Error(err),
+				)
 				h.HandleError(ctx, chatID, err)
 				return
 			}
+
+			h.Logger.Info("diagram rendered successfully",
+				zap.Int64("chat_id", chatID.ID),
+				zap.Int("message_id", processingMsg.MessageID),
+				zap.Int("diagram_size", len(b)),
+			)
 
 			_, err = h.Bot.EditMessageMedia(
 				ctx,
@@ -163,6 +196,11 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 				),
 			)
 			if err != nil {
+				h.Logger.Error("failed to edit message media",
+					zap.Int64("chat_id", chatID.ID),
+					zap.Int("message_id", processingMsg.MessageID),
+					zap.Error(err),
+				)
 				h.HandleError(ctx, chatID, err)
 			}
 		},

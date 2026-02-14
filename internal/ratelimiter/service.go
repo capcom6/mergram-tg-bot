@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/samber/lo"
+	"go.uber.org/zap"
 )
 
 // Service implements rate limiting per user.
@@ -15,12 +16,13 @@ type Service struct {
 	requests    map[int64][]time.Time
 	maxRequests int
 	window      time.Duration
+	logger      *zap.Logger
 }
 
 // New creates a new rate limiter.
 // maxRequests: maximum number of requests allowed per window
 // window: time window for rate limiting
-func New(config Config) (*Service, error) {
+func New(config Config, logger *zap.Logger) (*Service, error) {
 	if config.MaxRequests <= 0 {
 		return nil, fmt.Errorf("%w: MaxRequests must be greater than 0", ErrInvalidConfig)
 	}
@@ -33,6 +35,7 @@ func New(config Config) (*Service, error) {
 		requests:    make(map[int64][]time.Time),
 		maxRequests: config.MaxRequests,
 		window:      config.Window,
+		logger:      logger,
 	}, nil
 }
 
@@ -67,15 +70,30 @@ func (r *Service) Register(userID int64) error {
 		// Update the requests for this user
 		r.requests[userID] = validRequests
 
+		resetTime := validRequests[0].Add(r.window)
+		r.logger.Warn("rate limit exceeded",
+			zap.Int64("user_id", userID),
+			zap.Int("max_requests", r.maxRequests),
+			zap.Int("current_requests", len(validRequests)),
+			zap.Time("reset_time", resetTime),
+		)
+
 		return newLimitExceededError(
 			r.maxRequests,
 			r.window,
-			validRequests[0].Add(r.window),
+			resetTime,
 		)
 	}
 
 	// Add current request
-	r.requests[userID] = append(r.requests[userID], now)
+	r.requests[userID] = append(validRequests, now)
+
+	r.logger.Debug("rate limit check passed",
+		zap.Int64("user_id", userID),
+		zap.Int("current_requests", len(validRequests)+1),
+		zap.Int("max_requests", r.maxRequests),
+	)
+
 	return nil
 }
 
@@ -119,13 +137,25 @@ func (r *Service) Cleanup() {
 	defer r.mu.Unlock()
 
 	now := time.Now()
+	cleanedCount := 0
+	activeUsers := 0
+
 	for userID := range r.requests {
 		valid := r.getValidRequests(now, userID)
 		if len(valid) == 0 {
 			delete(r.requests, userID)
+			cleanedCount++
 		} else {
 			r.requests[userID] = valid
+			activeUsers++
 		}
+	}
+
+	if cleanedCount > 0 || activeUsers > 0 {
+		r.logger.Debug("rate limiter cleanup completed",
+			zap.Int("cleaned_users", cleanedCount),
+			zap.Int("active_users", activeUsers),
+		)
 	}
 }
 

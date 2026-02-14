@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/alitto/pond/v2"
 	"go.uber.org/zap"
@@ -45,7 +46,24 @@ func (s *Service) RenderAsync(diagram string, callback func(context.Context, []b
 	once := sync.Once{}
 
 	task := s.queue.Submit(func() {
+		start := time.Now()
 		data, err := s.Render(s.queue.Context(), diagram)
+		duration := time.Since(start)
+
+		if err != nil {
+			s.logger.Error("diagram render failed",
+				zap.Duration("duration", duration),
+				zap.Int("diagram_length", len(diagram)),
+				zap.Error(err),
+			)
+		} else {
+			s.logger.Info("diagram render completed",
+				zap.Duration("duration", duration),
+				zap.Int("diagram_length", len(diagram)),
+				zap.Int("output_size", len(data)),
+			)
+		}
+
 		once.Do(func() {
 			callback(s.queue.Context(), data, err)
 		})
@@ -53,7 +71,10 @@ func (s *Service) RenderAsync(diagram string, callback func(context.Context, []b
 
 	go func() {
 		if err := task.Wait(); err != nil {
-			s.logger.Error("render diagram", zap.Error(err))
+			s.logger.Error("render task failed",
+				zap.Error(err),
+				zap.Int("diagram_length", len(diagram)),
+			)
 			once.Do(func() {
 				callback(s.queue.Context(), nil, err)
 			})
