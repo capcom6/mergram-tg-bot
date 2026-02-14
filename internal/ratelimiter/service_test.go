@@ -6,10 +6,13 @@ import (
 	"time"
 
 	"github.com/capcom6/mergram-tg-bot/internal/ratelimiter"
+	"go.uber.org/zap"
 )
 
 func TestRateLimiter(t *testing.T) {
-	rl, _ := ratelimiter.New(ratelimiter.Config{MaxRequests: 3, Window: time.Minute})
+	logger := zap.NewNop()
+	defer logger.Sync()
+	rl, _ := ratelimiter.New(ratelimiter.Config{MaxRequests: 3, Window: time.Minute}, logger)
 
 	userID := int64(12345)
 
@@ -50,7 +53,9 @@ func TestRateLimiter(t *testing.T) {
 }
 
 func TestRateLimiterConcurrency(t *testing.T) {
-	rl, _ := ratelimiter.New(ratelimiter.Config{MaxRequests: 3, Window: time.Minute})
+	logger := zap.NewNop()
+	defer logger.Sync()
+	rl, _ := ratelimiter.New(ratelimiter.Config{MaxRequests: 3, Window: time.Minute}, logger)
 	userID := int64(67890)
 
 	// Simulate concurrent requests
