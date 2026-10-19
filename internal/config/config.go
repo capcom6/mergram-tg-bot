@@ -16,7 +16,8 @@ type httpConfig struct {
 }
 
 type telegramConfig struct {
-	Token string `koanf:"token"`
+	Token    string `koanf:"token"`
+	ProxyURL string `koanf:"proxy_url"`
 }
 
 type rendererConfig struct {
@@ -49,7 +50,8 @@ func New(logger *zap.Logger) (Config, error) {
 			Proxies:     []string{},
 		},
 		Telegram: telegramConfig{
-			Token: "",
+			Token:    "",
+			ProxyURL: "",
 		},
 		Renderer: rendererConfig{
 			Timeout: 3 * time.Second,

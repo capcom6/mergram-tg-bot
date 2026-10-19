@@ -4,9 +4,9 @@ import (
 	"github.com/capcom6/mergram-tg-bot/internal/ratelimiter"
 	"github.com/capcom6/mergram-tg-bot/internal/renderer"
 	"github.com/capcom6/mergram-tg-bot/pkg/pondfx"
-	"github.com/capcom6/mergram-tg-bot/pkg/telegofx"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/logger"
+	"github.com/go-core-fx/telegofx"
 	"go.uber.org/fx"
 )
 
@@ -31,6 +31,7 @@ func Module() fx.Option {
 			func(cfg Config) telegofx.Config {
 				return telegofx.Config{
 					Token: cfg.Telegram.Token,
+					ProxyURL: cfg.Telegram.ProxyURL,
 				}
 			},
 		),

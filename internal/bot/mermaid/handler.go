@@ -10,7 +10,7 @@ import (
 	"github.com/capcom6/mergram-tg-bot/internal/bot/handler"
 	"github.com/capcom6/mergram-tg-bot/internal/ratelimiter"
 	"github.com/capcom6/mergram-tg-bot/internal/renderer"
-	"github.com/capcom6/mergram-tg-bot/pkg/telegofx"
+	"github.com/go-core-fx/telegofx"
 	"github.com/mymmrac/telego"
 	"github.com/samber/lo"
 	"go.uber.org/zap"

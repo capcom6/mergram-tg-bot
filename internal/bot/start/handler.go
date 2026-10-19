@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/capcom6/mergram-tg-bot/internal/bot/handler"
-	"github.com/capcom6/mergram-tg-bot/pkg/telegofx"
+	"github.com/go-core-fx/telegofx"
 	"github.com/mymmrac/telego"
 	"go.uber.org/zap"
 
