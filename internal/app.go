@@ -10,9 +10,9 @@ import (
 	"github.com/capcom6/mergram-tg-bot/internal/server"
 	"github.com/capcom6/mergram-tg-bot/pkg/mermaidinkfx"
 	"github.com/capcom6/mergram-tg-bot/pkg/pondfx"
-	"github.com/capcom6/mergram-tg-bot/pkg/telegofx"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/logger"
+	"github.com/go-core-fx/telegofx"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -23,7 +23,7 @@ func Run() {
 		logger.Module(),
 		logger.WithFxDefaultLogger(),
 		fiberfx.Module(),
-		telegofx.Module(true),
+		telegofx.Module(telegofx.WithRouter()),
 		mermaidinkfx.Module(),
 		pondfx.Module(),
 		// APP MODULES

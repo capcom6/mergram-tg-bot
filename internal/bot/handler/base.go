@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/capcom6/mergram-tg-bot/pkg/telegofx"
+	"github.com/go-core-fx/telegofx"
 	"github.com/mymmrac/telego"
 
 	tu "github.com/mymmrac/telego/telegoutil"
