@@ -30,7 +30,8 @@ func Module() fx.Option {
 		fx.Provide(
 			func(cfg Config) telegofx.Config {
 				return telegofx.Config{
-					Token: cfg.Telegram.Token,
+					Token:    cfg.Telegram.Token,
+					Mode:     telegofx.ModePolling,
 					ProxyURL: cfg.Telegram.ProxyURL,
 				}
 			},

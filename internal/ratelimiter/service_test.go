@@ -10,6 +10,8 @@ import (
 )
 
 func TestRateLimiter(t *testing.T) {
+	t.Parallel()
+
 	logger := zap.NewNop()
 	defer logger.Sync()
 	rl, _ := ratelimiter.New(ratelimiter.Config{MaxRequests: 3, Window: time.Minute}, logger)
@@ -53,6 +55,8 @@ func TestRateLimiter(t *testing.T) {
 }
 
 func TestRateLimiterConcurrency(t *testing.T) {
+	t.Parallel()
+
 	logger := zap.NewNop()
 	defer logger.Sync()
 	rl, _ := ratelimiter.New(ratelimiter.Config{MaxRequests: 3, Window: time.Minute}, logger)
