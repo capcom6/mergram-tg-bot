@@ -127,6 +127,21 @@ This guide will help you get MerGram up and running on your local machine for de
    RENDERER__TIMEOUT=10s
    ```
 
+   All settings are optional, the defaults are shown below:
+
+   | Variable                          | Default                 | Description                                                                          |
+   |-----------------------------------|-------------------------|--------------------------------------------------------------------------------------|
+   | `RENDERER__TIMEOUT`               | `10s`                   | Total budget of one diagram render, retries included.                                 |
+   | `RENDERER__MAX_ATTEMPTS`          | `3`                     | Render attempts per request.                                                         |
+   | `RENDERER__BACKOFF`               | `500ms`                 | Delay before the second attempt, doubled on every further attempt.                    |
+   | `MERMAIDINK__BASE_URL`            | `https://mermaid.ink`   | Mermaid.ink API root.                                                                |
+   | `HTTP_CLIENT__PROXY_URL`          | -                       | SOCKS5 proxy for the outgoing API calls, e.g. `socks5://user:pass@host:port`.        |
+   | `HTTP_CLIENT__BYPASS`             | -                       | Comma-separated hosts that bypass the proxy.                                         |
+   | `HTTP_CLIENT__TIMEOUT`            | `0`                     | Client-level timeout, `0` means the request deadline is the only limit.             |
+   | `HTTP_CLIENT__MAX_IDLE_CONNS`     | `100`                   | Maximum idle keep-alive connections.                                                 |
+   | `HTTP_CLIENT__MAX_IDLE_CONNS_PER_HOST` | `32`               | Maximum idle keep-alive connections per host.                                        |
+   | `HTTP_CLIENT__IDLE_CONN_TIMEOUT`  | `90s`                   | How long an idle connection is kept.                                                 |
+
 4. **Run the bot**
    ```sh
    make air
