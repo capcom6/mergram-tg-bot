@@ -3,6 +3,7 @@ package mermaid
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 	"unicode/utf16"
@@ -202,7 +203,8 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 				tu.EditMessageMedia(
 					chatID,
 					processingMsg.MessageID,
-					tu.MediaPhoto(tu.FileFromBytes(b, "diagram.png")).WithCaption("✅ Diagram rendered successfully!"),
+					tu.MediaPhoto(tu.FileFromBytes(b, imageFileName(b))).
+						WithCaption("✅ Diagram rendered successfully!"),
 				),
 			)
 			if err != nil {
@@ -225,5 +227,19 @@ func (h *Handler) editMessage(ctx context.Context, chatID telego.ChatID, message
 			zap.Int("message_id", messageID),
 			zap.Error(err),
 		)
+	}
+}
+
+// imageFileName names the uploaded image after its actual content type, the
+// renderer answers with JPEG while the extension of the name is what the API
+// gets to see.
+func imageFileName(data []byte) string {
+	switch http.DetectContentType(data) {
+	case "image/png":
+		return "diagram.png"
+	case "image/webp":
+		return "diagram.webp"
+	default:
+		return "diagram.jpg"
 	}
 }
