@@ -206,6 +206,21 @@ func TestRenderStopsWhenContextIsCanceled(t *testing.T) {
 	}
 }
 
+func TestIsTransient(t *testing.T) {
+	t.Parallel()
+
+	stub := &stubRenderer{}
+	svc := newService(t, stub)
+
+	if !svc.IsTransient(errTransient) {
+		t.Error("expected a transient failure to be transient")
+	}
+
+	if svc.IsTransient(errPermanent) {
+		t.Error("expected a permanent failure not to be transient")
+	}
+}
+
 func TestNewServiceRejectsInvalidConfig(t *testing.T) {
 	t.Parallel()
 

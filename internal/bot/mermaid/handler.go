@@ -23,6 +23,10 @@ type contextKey string
 
 const diagramCodeKey contextKey = "diagramCode"
 
+// renderUnavailableMessage is shown when the renderer could not draw the
+// diagram because it was busy or too slow, and another try may succeed.
+const renderUnavailableMessage = "⏳ The diagram renderer is busy or timed out. Please try again in a moment."
+
 type Handler struct {
 	handler.Base
 
@@ -177,6 +181,12 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 					zap.Int64("chat_id", chatID.ID),
 					zap.Error(err),
 				)
+
+				if h.rendererSvc.IsTransient(err) {
+					h.editMessage(ctx, chatID, processingMsg.MessageID, renderUnavailableMessage)
+					return
+				}
+
 				h.HandleError(ctx, chatID, err)
 				return
 			}
@@ -205,4 +215,15 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 			}
 		},
 	)
+}
+
+// editMessage replaces the text of a message that was already sent.
+func (h *Handler) editMessage(ctx context.Context, chatID telego.ChatID, messageID int, text string) {
+	if _, err := h.Bot.EditMessageText(ctx, tu.EditMessageText(chatID, messageID, text)); err != nil {
+		h.Logger.Error("failed to edit message text",
+			zap.Int64("chat_id", chatID.ID),
+			zap.Int("message_id", messageID),
+			zap.Error(err),
+		)
+	}
 }

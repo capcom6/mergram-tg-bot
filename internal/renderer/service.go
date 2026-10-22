@@ -170,6 +170,11 @@ func (s *Service) RenderAsync(diagram string, callback func(context.Context, []b
 	}()
 }
 
+// IsTransient reports whether the given render failure is worth retrying.
+func (s *Service) IsTransient(err error) bool {
+	return s.renderer.IsTransient(err)
+}
+
 // retryable reports whether the failed attempt is worth repeating.
 func (s *Service) retryable(ctx context.Context, err error) bool {
 	if ctx.Err() != nil {
