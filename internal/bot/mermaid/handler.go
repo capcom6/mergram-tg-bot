@@ -3,6 +3,7 @@ package mermaid
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 	"unicode/utf16"
@@ -22,6 +23,10 @@ import (
 type contextKey string
 
 const diagramCodeKey contextKey = "diagramCode"
+
+// renderUnavailableMessage is shown when the renderer could not draw the
+// diagram because it was busy or too slow, and another try may succeed.
+const renderUnavailableMessage = "⏳ The diagram renderer is busy or timed out. Please try again in a moment."
 
 type Handler struct {
 	handler.Base
@@ -177,6 +182,12 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 					zap.Int64("chat_id", chatID.ID),
 					zap.Error(err),
 				)
+
+				if h.rendererSvc.IsTransient(err) {
+					h.editMessage(ctx, chatID, processingMsg.MessageID, renderUnavailableMessage)
+					return
+				}
+
 				h.HandleError(ctx, chatID, err)
 				return
 			}
@@ -192,7 +203,8 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 				tu.EditMessageMedia(
 					chatID,
 					processingMsg.MessageID,
-					tu.MediaPhoto(tu.FileFromBytes(b, "diagram.png")).WithCaption("✅ Diagram rendered successfully!"),
+					tu.MediaPhoto(tu.FileFromBytes(b, imageFileName(b))).
+						WithCaption("✅ Diagram rendered successfully!"),
 				),
 			)
 			if err != nil {
@@ -205,4 +217,29 @@ func (h *Handler) render(ctx context.Context, chatID telego.ChatID, sourceMessag
 			}
 		},
 	)
+}
+
+// editMessage replaces the text of a message that was already sent.
+func (h *Handler) editMessage(ctx context.Context, chatID telego.ChatID, messageID int, text string) {
+	if _, err := h.Bot.EditMessageText(ctx, tu.EditMessageText(chatID, messageID, text)); err != nil {
+		h.Logger.Error("failed to edit message text",
+			zap.Int64("chat_id", chatID.ID),
+			zap.Int("message_id", messageID),
+			zap.Error(err),
+		)
+	}
+}
+
+// imageFileName names the uploaded image after its actual content type, the
+// renderer answers with JPEG while the extension of the name is what the API
+// gets to see.
+func imageFileName(data []byte) string {
+	switch http.DetectContentType(data) {
+	case "image/png":
+		return "diagram.png"
+	case "image/webp":
+		return "diagram.webp"
+	default:
+		return "diagram.jpg"
+	}
 }

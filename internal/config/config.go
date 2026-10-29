@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/capcom6/mergram-tg-bot/pkg/mermaidinkfx"
 	"github.com/go-core-fx/config"
 	"go.uber.org/zap"
 )
@@ -15,13 +16,28 @@ type httpConfig struct {
 	Proxies     []string `koanf:"proxies"`
 }
 
+type httpClientConfig struct {
+	ProxyURL            string        `koanf:"proxy_url"`
+	Bypass              string        `koanf:"bypass"`
+	Timeout             time.Duration `koanf:"timeout"`
+	MaxIdleConns        int           `koanf:"max_idle_conns"`
+	MaxIdleConnsPerHost int           `koanf:"max_idle_conns_per_host"`
+	IdleConnTimeout     time.Duration `koanf:"idle_conn_timeout"`
+}
+
 type telegramConfig struct {
 	Token    string `koanf:"token"`
 	ProxyURL string `koanf:"proxy_url"`
 }
 
 type rendererConfig struct {
-	Timeout time.Duration `koanf:"timeout"`
+	Timeout     time.Duration `koanf:"timeout"`
+	MaxAttempts int           `koanf:"max_attempts"`
+	Backoff     time.Duration `koanf:"backoff"`
+}
+
+type mermaidinkConfig struct {
+	BaseURL string `koanf:"base_url"`
 }
 
 type queueConfig struct {
@@ -35,8 +51,10 @@ type ratelimiterConfig struct {
 
 type Config struct {
 	HTTP        httpConfig        `koanf:"http"`
+	HTTPClient  httpClientConfig  `koanf:"http_client"`
 	Telegram    telegramConfig    `koanf:"telegram"`
 	Renderer    rendererConfig    `koanf:"renderer"`
+	MermaidInk  mermaidinkConfig  `koanf:"mermaidink"`
 	Queue       queueConfig       `koanf:"queue"`
 	RateLimiter ratelimiterConfig `koanf:"ratelimiter"`
 }
@@ -49,12 +67,25 @@ func New(logger *zap.Logger) (Config, error) {
 			ProxyHeader: "X-Forwarded-For",
 			Proxies:     []string{},
 		},
+		HTTPClient: httpClientConfig{
+			ProxyURL:            "",
+			Bypass:              "",
+			Timeout:             0,
+			MaxIdleConns:        100,
+			MaxIdleConnsPerHost: 32,
+			IdleConnTimeout:     90 * time.Second,
+		},
 		Telegram: telegramConfig{
 			Token:    "",
 			ProxyURL: "",
 		},
 		Renderer: rendererConfig{
-			Timeout: 3 * time.Second,
+			Timeout:     10 * time.Second,
+			MaxAttempts: 3,
+			Backoff:     500 * time.Millisecond,
+		},
+		MermaidInk: mermaidinkConfig{
+			BaseURL: mermaidinkfx.BaseURL,
 		},
 		Queue: queueConfig{
 			MaxConcurrency: runtime.NumCPU() * 16,

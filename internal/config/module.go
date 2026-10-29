@@ -3,8 +3,10 @@ package config
 import (
 	"github.com/capcom6/mergram-tg-bot/internal/ratelimiter"
 	"github.com/capcom6/mergram-tg-bot/internal/renderer"
+	"github.com/capcom6/mergram-tg-bot/pkg/mermaidinkfx"
 	"github.com/capcom6/mergram-tg-bot/pkg/pondfx"
 	"github.com/go-core-fx/fiberfx"
+	"github.com/go-core-fx/httpfx"
 	"github.com/go-core-fx/logger"
 	"github.com/go-core-fx/telegofx"
 	"go.uber.org/fx"
@@ -28,6 +30,24 @@ func Module() fx.Option {
 			},
 		),
 		fx.Provide(
+			func(cfg Config) httpfx.Config {
+				return httpfx.Config{
+					ProxyURL:            cfg.HTTPClient.ProxyURL,
+					Bypass:              cfg.HTTPClient.Bypass,
+					Timeout:             cfg.HTTPClient.Timeout,
+					MaxIdleConns:        cfg.HTTPClient.MaxIdleConns,
+					MaxIdleConnsPerHost: cfg.HTTPClient.MaxIdleConnsPerHost,
+					IdleConnTimeout:     cfg.HTTPClient.IdleConnTimeout,
+					// The upstream API is reached over the public CA.
+					TLS: httpfx.TLSConfig{
+						RootCAFile:          "",
+						RootCAPEM:           "",
+						RootCAReplaceSystem: false,
+					},
+				}
+			},
+		),
+		fx.Provide(
 			func(cfg Config) telegofx.Config {
 				return telegofx.Config{
 					Token:    cfg.Telegram.Token,
@@ -47,7 +67,16 @@ func Module() fx.Option {
 		fx.Provide(
 			func(cfg Config) renderer.Config {
 				return renderer.Config{
-					Timeout: cfg.Renderer.Timeout,
+					Timeout:     cfg.Renderer.Timeout,
+					MaxAttempts: cfg.Renderer.MaxAttempts,
+					Backoff:     cfg.Renderer.Backoff,
+				}
+			},
+		),
+		fx.Provide(
+			func(cfg Config) mermaidinkfx.Config {
+				return mermaidinkfx.Config{
+					BaseURL: cfg.MermaidInk.BaseURL,
 				}
 			},
 		),
