@@ -8,9 +8,11 @@ import (
 	"github.com/capcom6/mergram-tg-bot/internal/ratelimiter"
 	"github.com/capcom6/mergram-tg-bot/internal/renderer"
 	"github.com/capcom6/mergram-tg-bot/internal/server"
+	"github.com/capcom6/mergram-tg-bot/internal/telegram"
 	"github.com/capcom6/mergram-tg-bot/pkg/mermaidinkfx"
 	"github.com/capcom6/mergram-tg-bot/pkg/pondfx"
 	"github.com/go-core-fx/fiberfx"
+	"github.com/go-core-fx/healthfx"
 	"github.com/go-core-fx/httpfx"
 	"github.com/go-core-fx/logger"
 	"github.com/go-core-fx/telegofx"
@@ -18,21 +20,38 @@ import (
 	"go.uber.org/zap"
 )
 
-func Run() {
+func Run(version healthfx.Version) {
 	fx.New(
 		// CORE MODULES
 		logger.Module(),
 		logger.WithFxDefaultLogger(),
+		// badgerfx.Module(),
+		// bunfx.Module(),
 		fiberfx.Module(),
+		// gocqlfx.Module(),
+		// gocqlxfx.Module(),
+		// goosefx.Module(),
+		// gormfx.Module(),
+		healthfx.Module(),
 		httpfx.Module(),
-		telegofx.Module(telegofx.WithRouter()),
-		mermaidinkfx.Module(),
-		pondfx.Module(),
+		// openaifx.Module(),
+		// openrouterfx.Module(),
+		// redisfx.Module(),
+		// sqlfx.Module(),
+		// sqlxfx.Module(),
+		telegofx.Module(telegofx.WithRouter(), telegofx.WithHealth()),
+		// validatorfx.Module(),
+		// watermillfx.Module(),
+		//
 		// APP MODULES
 		config.Module(),
+		mermaidinkfx.Module(),
+		pondfx.Module(),
+		telegram.Module(),
 		server.Module(),
 		bot.Module(),
 		// BUSINESS MODULES
+		fx.Supply(version),
 		renderer.Module(),
 		ratelimiter.Module(),
 		//

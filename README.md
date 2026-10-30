@@ -131,6 +131,9 @@ This guide will help you get MerGram up and running on your local machine for de
 
    | Variable                               | Default               | Description                                                                   |
    | -------------------------------------- | --------------------- | ----------------------------------------------------------------------------- |
+   | `TELEGRAM__TOKEN`                      | -                     | Bot API token (required for the bot to start polling).                        |
+   | `TELEGRAM__PROXY_URL`                  | -                     | SOCKS5 proxy for the bot's API traffic only, e.g. `socks5h://host:port`.       |
+   | `TELEGRAM__TIMEOUT`                    | `1m`                  | Timeout of one bot API request; must be greater than the 8s long-poll hold.    |
    | `RENDERER__TIMEOUT`                    | `10s`                 | Total budget of one diagram render, retries included.                         |
    | `RENDERER__MAX_ATTEMPTS`               | `3`                   | Render attempts per request.                                                  |
    | `RENDERER__BACKOFF`                    | `500ms`               | Delay before the second attempt, doubled on every further attempt.            |
