@@ -10,18 +10,32 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
-const BaseURL = "https://mermaid.ink"
-
+// Client renders Mermaid diagrams through the Mermaid.ink API.
+//
+// The client is a thin transport: it performs a single request per call and
+// reports what the API answered. Retrying is the caller's decision.
 type Client struct {
-	client *http.Client
+	client  *http.Client
+	baseURL string
 }
 
-func NewClient() (*Client, error) {
-	return &Client{http.DefaultClient}, nil
+// NewClient creates a Mermaid.ink client on top of the given HTTP client.
+func NewClient(config Config, client *http.Client) (*Client, error) {
+	baseURL := strings.TrimRight(config.BaseURL, "/")
+	if baseURL == "" {
+		return nil, fmt.Errorf("%w: empty base URL", ErrInvalidConfig)
+	}
+
+	return &Client{
+		client:  client,
+		baseURL: baseURL,
+	}, nil
 }
 
+// Render draws the diagram and returns the encoded image.
 func (c *Client) Render(ctx context.Context, diagram string) ([]byte, error) {
 	input := Request{
 		Code: diagram,
@@ -37,8 +51,8 @@ func (c *Client) Render(ctx context.Context, diagram string) ([]byte, error) {
 		return nil, fmt.Errorf("encode diagram: %w", err)
 	}
 
-	url := fmt.Sprintf("%s/img/pako:%s", BaseURL, encoded)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	requestURL := c.baseURL + "/img/pako:" + encoded
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -53,6 +67,10 @@ func (c *Client) Render(ctx context.Context, diagram string) ([]byte, error) {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= http.StatusInternalServerError {
+			return nil, fmt.Errorf("%w: unexpected status code: %d", ErrUpstreamUnavailable, resp.StatusCode)
+		}
+
 		return nil, fmt.Errorf("%w: unexpected status code: %d", ErrAPIError, resp.StatusCode)
 	}
 

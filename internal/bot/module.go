@@ -7,7 +7,6 @@ import (
 	"github.com/capcom6/mergram-tg-bot/internal/bot/start"
 	"github.com/go-core-fx/logger"
 	"github.com/go-core-fx/telegofx"
-	"github.com/mymmrac/telego"
 	"go.uber.org/fx"
 )
 
@@ -15,9 +14,6 @@ func Module() fx.Option {
 	return fx.Module(
 		"bot",
 		logger.WithNamedLogger("bot"),
-		fx.Provide(func() []telego.BotOption {
-			return nil
-		}),
 		// Provide handlers
 		fx.Provide(
 			fx.Annotate(start.New, fx.ResultTags(`group:"handlers"`)),

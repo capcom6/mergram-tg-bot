@@ -103,7 +103,7 @@ This guide will help you get MerGram up and running on your local machine for de
 
 ### Prerequisites
 
-- **Go 1.25.5+**: Download from [golang.org](https://golang.org/dl/)
+- **Go 1.26.7+**: Download from [golang.org](https://golang.org/dl/)
 - **Git**: For version control
 - **Telegram Bot Token**: Create a bot via [@BotFather](https://t.me/BotFather)
 
@@ -126,6 +126,24 @@ This guide will help you get MerGram up and running on your local machine for de
    TELEGRAM__TOKEN=your_bot_token_here
    RENDERER__TIMEOUT=10s
    ```
+
+   All settings are optional, the defaults are shown below:
+
+   | Variable                               | Default               | Description                                                                   |
+   | -------------------------------------- | --------------------- | ----------------------------------------------------------------------------- |
+   | `TELEGRAM__TOKEN`                      | -                     | Bot API token (required for the bot to start polling).                        |
+   | `TELEGRAM__PROXY_URL`                  | -                     | SOCKS5 proxy for the bot's API traffic only, e.g. `socks5h://host:port`.       |
+   | `TELEGRAM__TIMEOUT`                    | `1m`                  | Timeout of one bot API request; must be greater than the 8s long-poll hold.    |
+   | `RENDERER__TIMEOUT`                    | `10s`                 | Total budget of one diagram render, retries included.                         |
+   | `RENDERER__MAX_ATTEMPTS`               | `3`                   | Render attempts per request.                                                  |
+   | `RENDERER__BACKOFF`                    | `500ms`               | Delay before the second attempt, doubled on every further attempt.            |
+   | `MERMAIDINK__BASE_URL`                 | `https://mermaid.ink` | Mermaid.ink API root.                                                         |
+   | `HTTP_CLIENT__PROXY_URL`               | -                     | SOCKS5 proxy for the outgoing API calls, e.g. `socks5://user:pass@host:port`. |
+   | `HTTP_CLIENT__BYPASS`                  | -                     | Comma-separated hosts that bypass the proxy.                                  |
+   | `HTTP_CLIENT__TIMEOUT`                 | `0`                   | Client-level timeout, `0` means the request deadline is the only limit.       |
+   | `HTTP_CLIENT__MAX_IDLE_CONNS`          | `100`                 | Maximum idle keep-alive connections.                                          |
+   | `HTTP_CLIENT__MAX_IDLE_CONNS_PER_HOST` | `32`                  | Maximum idle keep-alive connections per host.                                 |
+   | `HTTP_CLIENT__IDLE_CONN_TIMEOUT`       | `90s`                 | How long an idle connection is kept.                                          |
 
 4. **Run the bot**
    ```sh
