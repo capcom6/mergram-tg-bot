@@ -10,9 +10,9 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "API Support",
+            "name": "Maintainer",
             "url": "https://github.com/capcom6",
-            "email": "i@capcom.me"
+            "email": "support@mergram.dev"
         },
         "license": {
             "name": "Apache 2.0",
@@ -31,8 +31,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:3000",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Project API",
-	Description:      "Project API documentation",
+	Title:            "Mermaid Diagram Bot",
+	Description:      "A Telegram bot that automatically detects Mermaid diagram syntax in group conversations and converts it to rendered images, making technical discussions more visual and accessible",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

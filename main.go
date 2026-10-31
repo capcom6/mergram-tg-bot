@@ -1,12 +1,12 @@
-// Golang project template
+// Mermaid Diagram Bot for Telegram
 //
-//	@title			Project API
+//	@title			Mermaid Diagram Bot
 //	@version		1.0.0
-//	@description	Project API documentation
+//	@description	A Telegram bot that automatically detects Mermaid diagram syntax in group conversations and converts it to rendered images, making technical discussions more visual and accessible
 //
-//	@contact.name	API Support
+//	@contact.name	Maintainer
 //	@contact.url	https://github.com/capcom6
-//	@contact.email	i@capcom.me
+//	@contact.email	support@mergram.dev
 //
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
